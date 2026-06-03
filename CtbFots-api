@@ -1,0 +1,131 @@
+
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
+
+const API_URL = "http://localhost:3000";
+
+const categories = ["All", "Music", "Food", "Family", "Sports", "Culture"];
+
+export default function App() {
+  const [events, setEvents] = useState([]);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [selected, setSelected] = useState(null);
+  const [saved, setSaved] = useState([]);
+  useEffect(() => {
+    fetch(`${API_URL}/events`).then(res => res.json()).then(setEvents);
+  }, []);
+
+  const toggleSave = (id) => {
+    setSaved(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+  };
+
+
+  const filtered = events.filter(e =>
+    e.title.toLowerCase().includes(search.toLowerCase()) &&
+    (category === "All" || e.category === category)
+  );
+
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#0f172a" }}>
+
+
+      {/* HEADER */}
+      <View style={{ padding: 20, paddingTop: 50 }}>
+        <Text style={{ fontSize: 28, fontWeight: "bold", color: "white" }}>
+          Festival of the Sea
+        </Text>
+        <Text style={{ color: "#cbd5f5" }}>Live Events & Updates</Text>
+      </View>
+
+
+      {/* SEARCH */}
+      <View style={{ paddingHorizontal: 20 }}>
+        <TextInput
+          placeholder="Search events..."
+          placeholderTextColor="#94a3b8"
+          value={search}
+          onChangeText={setSearch}
+          style={{ backgroundColor: "#1e293b", color: "white", padding: 10, borderRadius: 10 }}
+        />
+      </View>
+
+
+      {/* CATEGORY FILTER */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ padding: 10 }}>
+        {categories.map(c => (
+          <TouchableOpacity
+            key={c}
+            onPress={() => setCategory(c)}
+            style={{
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              marginRight: 8,
+              borderRadius: 20,
+              backgroundColor: category === c ? "#38bdf8" : "#1e293b",
+            }}
+          >
+            <Text style={{ color: "white" }}>{c}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+
+      {/* EVENT LIST */}
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item._id || item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => setSelected(item)}>
+            <View style={{ margin: 10, backgroundColor: "#1e293b", borderRadius: 12, overflow: "hidden" }}>
+              <Image source={{ uri: item.image }} style={{ height: 160 }} />
+              <View style={{ padding: 12 }}>
+                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{item.title}</Text>
+                <Text style={{ color: "#94a3b8" }}>{item.date} • {item.time}</Text>
+                <Text style={{ color: "#cbd5f5" }}>{item.venue}</Text>
+
+
+                <TouchableOpacity onPress={() => toggleSave(item.id)}>
+                  <Text style={{ color: "#38bdf8", marginTop: 5 }}>
+                    {saved.includes(item.id) ? "★ Saved" : "☆ Save"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+
+
+      {/* EVENT MODAL */}
+      {selected && (
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.8)", justifyContent: "center" }}>
+          <View style={{ backgroundColor: "white", margin: 20, borderRadius: 12 }}>
+            <Image source={{ uri: selected.image }} style={{ height: 200 }} />
+            <View style={{ padding: 15 }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>{selected.title}</Text>
+              <Text>{selected.date} • {selected.time}</Text>
+              <Text>{selected.venue}</Text>
+              <Text>{selected.description}</Text>
+
+
+              <TouchableOpacity style={{ backgroundColor: "#38bdf8", padding: 10, marginTop: 10, borderRadius: 8 }} onPress={() => setSelected(null)}>
+                <Text style={{ textAlign: "center" }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+
+    </View>
+  );
+}
