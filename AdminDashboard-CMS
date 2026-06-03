@@ -1,0 +1,50 @@
+
+
+/*
+
+import React, { useState, useEffect } from 'react';
+
+export default function AdminDashboard() {
+  const [events, setEvents] = useState([]);
+  const [form, setForm] = useState({ title: '', date: '', time: '', venue: '', category: '' });
+
+  const fetchEvents = async () => {
+    const res = await fetch('/events');
+    setEvents(await res.json());
+  };
+
+  useEffect(() => { fetchEvents(); }, []);
+
+  const saveEvent = async () => {
+    await fetch('/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
+    fetchEvents();
+  };
+
+  const deleteEvent = async (id) => {
+    await fetch(`/events/${id}`, { method: 'DELETE' });
+    fetchEvents();
+  };
+
+  return (
+    <div>
+      <h1>Festival Admin</h1>
+      <input placeholder="Title" onChange={e => setForm({...form, title:e.target.value})}/>
+      <input placeholder="Date" onChange={e => setForm({...form, date:e.target.value})}/>
+      <button onClick={saveEvent}>Add</button>
+
+      {events.map(e => (
+        <div key={e._id}>
+          {e.title}
+          <button onClick={() => deleteEvent(e._id)}>Delete</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+*/
+
